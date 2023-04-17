@@ -19,9 +19,9 @@ export default {
     };
   },
   methods: {
-    login() {
-      // ログイン処理
-      this.$router.push({ name: 'MyNFTs', params: { walletAddress: this.walletAddress } });
+    async login() {
+      await this.$store.dispatch('nft/setWalletAddressAction', this.walletAddress);
+      this.$router.push({ name: 'MyNFTs' });
     },
   },
 };
