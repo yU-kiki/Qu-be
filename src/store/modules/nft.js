@@ -1,4 +1,6 @@
 import { ThirdwebSDK } from "@thirdweb-dev/sdk/evm";
+import { collection, doc, setDoc } from 'firebase/firestore';
+import db from '@/firebase.js';
 
 const sdk = new ThirdwebSDK("mumbai");
 // コントラクトアドレス
@@ -26,6 +28,21 @@ const actions = {
   async getMetadata(_, walletAddress) {
     const contract = await sdk.getContract(contractAddress);
     const nfts = await contract.erc721.getOwned(walletAddress);
+    
+    const nftArray = nfts.map((nft) => {
+      return {
+        name: nft.metadata.name,
+        url: nft.metadata.image,
+      };
+    });
+
+    try {
+      const nftDocRef = doc(collection(db, walletAddress), 'nfts');
+      await setDoc(nftDocRef, { nftArray });
+      console.log('NFTs added successfully');
+    } catch (error) {
+      console.error('Error adding NFTs: ', error);
+    }
     console.log(nfts);
   }
 }
