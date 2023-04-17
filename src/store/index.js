@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import nft from './modules/nft'
+import three from './modules/three'
 
 export default createStore({
   state: {
@@ -11,6 +12,7 @@ export default createStore({
   actions: {
   },
   modules: {
-    nft
+    nft,
+    three
   }
 })
