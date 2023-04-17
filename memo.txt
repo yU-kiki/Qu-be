@@ -1,0 +1,38 @@
+nft-marketplace
+│
+├── public
+│   ├── favicon.ico
+│   └── index.html
+│
+├── src
+│   ├── assets
+│   │   ├── images
+│   │   └── styles
+│   │
+│   ├── components
+│   │   ├── NFTCard.vue
+│   │   ├── NFTList.vue
+│   │   ├── UserProfile.vue
+│   │   └── other_components.vue
+│   │
+│   ├── store
+│   │   ├── index.js
+│   │   └── modules
+│   │       ├── nft.js
+│   │       └── user.js
+│   │
+│   ├── views
+│   │   ├── Home.vue
+│   │   ├── Marketplace.vue
+│   │   ├── MyNFTs.vue
+│   │   └── other_views.vue
+│   │
+│   ├── App.vue
+│   ├── main.js
+│   └── router.js
+│
+├── .gitignore
+├── babel.config.js
+├── package-lock.json
+├── package.json
+└── README.md
