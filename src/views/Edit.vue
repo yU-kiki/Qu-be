@@ -1,14 +1,28 @@
 <template>
   <div>
     <p>Editing NFT for wallet address: {{ walletAddress }}</p>
+    <button @click="openModal">Select NFT</button>
+    <div id="myModal" class="modal" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <div
+          class="image-container"
+          :class="{ selected: selectedImage === image }"
+          v-for="(image, index) in images"
+          :key="index"
+          @click="selectImage(image)"
+        >
+          <img :src="image" alt="Sample Image" width="200" />
+        </div>
+      </div>
+    </div>
     <div class="display">
       <canvas id="myCanvas" ref="myCanvas" class="my-canvas"></canvas>
     </div>
     <div class="edit">
-      <form>
+      <!-- <form>
         <input id="input-file" type="file" @change="handleFileChange" />
         <input type="submit" />
-      </form>
+      </form> -->
       <form class="face__container" id="faces">
         <div class="face__item">
           <img class="face__item-img" id="preview-1" />
@@ -88,6 +102,12 @@ export default {
   },
   data() {
     return {
+      showModal: false,
+      selectedImage: null,
+      images: [
+        "https://ipfs.thirdwebcdn.com/ipfs/QmTEYP9HBsRHfL7VgUT6DpAdSXZnPRJM9HqJTaQ2UA9ZDY/0.png",
+        "https://ipfs.thirdwebcdn.com/ipfs/QmVPuaQLfQ8vzpSECF9GbivU9EXAW7uA5qJzJ4CWR7DtrG/1.png",
+      ],
       colors: [
         "#FDDE00",
         "#ffffff",
@@ -104,7 +124,20 @@ export default {
     this.initThree();
   },
   methods: {
-    initThree() {
+    openModal() {
+      this.showModal = true;
+      document.body.style.overflow = "hidden";
+    },
+    closeModal() {
+      this.showModal = false;
+      document.body.style.overflow = "auto";
+    },
+    selectImage(image) {
+      this.selectedImage = image;
+      this.showModal = false;
+      this.initThree(this.selectedImage);
+    },
+    initThree(selectImage) {
       // シーンを作成
       const scene = new THREE.Scene();
 
@@ -174,58 +207,71 @@ export default {
         }
       };
 
-      const file = document.getElementById("input-file");
+      // const file = document.getElementById("input-file");
 
-      const updateImage = (input, number) => {
-        const file = input.files[0];
-        if (!file) return;
+      // const updateImage = (input, number) => {
+      //   const file = input.files[0];
+      //   if (!file) return;
 
-        const reader = new FileReader();
-        reader.addEventListener("load", () => {
-          const img = new Image();
-          img.addEventListener("load", () => {
-            // 画像のサイズを調整
-            const MAX_SIZE = 512;
-            let width = img.width;
-            let height = img.height;
-            if (width > MAX_SIZE || height > MAX_SIZE) {
-              if (width > height) {
-                height *= MAX_SIZE / width;
-                width = MAX_SIZE;
-              } else {
-                width *= MAX_SIZE / height;
-                height = MAX_SIZE;
-              }
-            }
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = 512;
-            canvas.height = 512;
+      //   const reader = new FileReader();
+      //   reader.addEventListener("load", () => {
+      //     const img = new Image();
+      //     img.addEventListener("load", () => {
+      //       // 画像のサイズを調整
+      //       const MAX_SIZE = 512;
+      //       let width = img.width;
+      //       let height = img.height;
+      //       if (width > MAX_SIZE || height > MAX_SIZE) {
+      //         if (width > height) {
+      //           height *= MAX_SIZE / width;
+      //           width = MAX_SIZE;
+      //         } else {
+      //           width *= MAX_SIZE / height;
+      //           height = MAX_SIZE;
+      //         }
+      //       }
+      //       const canvas = document.createElement("canvas");
+      //       const ctx = canvas.getContext("2d");
+      //       canvas.width = 512;
+      //       canvas.height = 512;
 
-            const index = ["1", "2", "3", "4", "5", "6"].indexOf(number);
-            // 画像を貼り付ける
-            const preImg = new Image();
-            preImg.addEventListener("load", () => {
-              ctx.drawImage(preImg, 0, 0, canvas.width, canvas.width);
-              ctx.drawImage(img, 0, 0, width, height);
-              this.imgUrls[index] = canvas.toDataURL();
-              // テクスチャーを更新
-              updateMesh();
-            });
-            preImg.src = this.imgUrls[index];
-          });
-          img.src = reader.result;
-        });
-        reader.readAsDataURL(file);
+      //       const index = ["1", "2", "3", "4", "5", "6"].indexOf(number);
+      //       // 画像を貼り付ける
+      //       const preImg = new Image();
+      //       preImg.addEventListener("load", () => {
+      //         ctx.drawImage(preImg, 0, 0, canvas.width, canvas.width);
+      //         ctx.drawImage(img, 0, 0, width, height);
+      //         this.imgUrls[index] = canvas.toDataURL();
+      //         // テクスチャーを更新
+      //         updateMesh();
+      //       });
+      //       preImg.src = this.imgUrls[index];
+      //     });
+      //     img.src = reader.result;
+      //   });
+      //   reader.readAsDataURL(file);
+      // };
+
+      // // ファイルが選択されたら実行
+      // file.addEventListener("change", (event) => {
+      //   const number = document.querySelector(
+      //     '.face__container input[name="number"]:checked'
+      //   ).value;
+      //   updateImage(event.target, number);
+      // });
+
+      const updateImage = (selectImage, number) => {
+        const index = ["1", "2", "3", "4", "5", "6"].indexOf(number);
+        this.imgUrls[index] = selectImage;
+        // テクスチャーを更新
+        updateMesh();
+      };
+      const number = document.querySelector(
+        '.face__container input[name="number"]:checked'
+      ).value;
+      if (selectImage) {
+        updateImage(selectImage, number);
       }
-
-      // ファイルが選択されたら実行
-      file.addEventListener("change", (event) => {
-        const number = document.querySelector(
-          '.face__container input[name="number"]:checked'
-        ).value;
-        updateImage(event.target, number);
-      });
 
       // シーンにメッシュを追加
       scene.add(cube);
@@ -249,10 +295,53 @@ export default {
       updateMesh();
     },
   },
+  watch: {
+    showModal(val) {
+      const modal = document.getElementById("myModal");
+      if (val) {
+        modal.style.display = "block";
+      } else {
+        modal.style.display = "none";
+      }
+    },
+  },
 };
 </script>
 
 <style>
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.image-container {
+  margin: 10px;
+  cursor: pointer;
+}
+
+.selected {
+  border: 3px solid #00f;
+}
+
 .edit {
   position: fixed;
   top: 0;
@@ -260,7 +349,7 @@ export default {
   width: 50%;
   height: 100%;
   padding: 80px 4vw 80px 0;
-  z-index: 100;
+  z-index: 10;
   background: #e5e5e5;
 }
 
